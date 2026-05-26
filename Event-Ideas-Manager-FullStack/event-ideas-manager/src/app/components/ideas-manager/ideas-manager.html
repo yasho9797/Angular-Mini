@@ -1,0 +1,96 @@
+<div class="container" dir="rtl">
+  <h2>ניהול רעיונות לאירועים</h2>
+
+  <div *ngIf="errorMessage" class="alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <div class="form-container">
+    <h3>{{ isEditing ? 'עריכת רעיון' : 'הוספת רעיון חדש' }}</h3>
+    <form (ngSubmit)="saveIdea()">
+      
+      <div class="form-group">
+        <label>מזהה רעיון (ID ייחודי):</label>
+        <input type="text" [(ngModel)]="currentIdea.id" name="id" [disabled]="isEditing" required>
+      </div>
+
+      <div class="form-group">
+        <label>שם הרעיון:</label>
+        <input type="text" [(ngModel)]="currentIdea.name" name="name" required>
+      </div>
+
+      <div class="form-group">
+        <label>סוג פעילות:</label>
+        <select [(ngModel)]="currentIdea.activityType" name="activityType" required>
+          <option value="">-- בחר סוג פעילות --</option>
+          <option *ngFor="let type of activityTypes" [value]="type">{{ type }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>קהל יעד:</label>
+        <select [(ngModel)]="currentIdea.targetAudience" name="targetAudience" required>
+          <option value="">-- בחר קהל יעד --</option>
+          <option *ngFor="let audience of targetAudiences" [value]="audience">{{ audience }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>משך זמן (בדקות):</label>
+        <input type="number" [(ngModel)]="currentIdea.duration" name="duration" required>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">{{ isEditing ? 'עדכן רעיון' : 'הוסף רעיון' }}</button>
+        <button type="button" *ngIf="isEditing" class="btn-cancel" (click)="isEditing = false; currentIdea = getEmptyIdea()">ביטול עריכה</button>
+      </div>
+    </form>
+  </div>
+
+  <hr>
+
+  <h3>רשימת הרעיונות הנוכחית</h3>
+  <table class="ideas-table">
+    <thead>
+      <tr>
+        <th>מזהה (ID)</th>
+        <th>שם הרעיון</th>
+        <th>סוג פעילות</th>
+        <th>קהל יעד</th>
+        <th>משך (דקות)</th>
+        <th>סטטוס</th>
+        <th>פעולות מנהל</th>
+        <th>פעולות קובץ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let idea of ideas">
+        <td>{{ idea.id }}</td>
+        <td class="bold-text">{{ idea.name }}</td>
+        <td>{{ idea.activityType }}</td>
+        <td>{{ idea.targetAudience }}</td>
+        <td>{{ idea.duration }} דק'</td>
+        <td>
+          <span class="status-badge" [ngClass]="{
+            'pending': idea.status === 'ממתין לאישור',
+            'approved': idea.status === 'מאושר',
+            'rejected': idea.status === 'נדחה'
+          }">
+            {{ idea.status }}
+          </span>
+        </td>
+        <td>
+          <button class="btn-status approve" (click)="changeStatus(idea, 'מאושר')">אשר</button>
+          <button class="btn-status reject" (click)="changeStatus(idea, 'נדחה')">דחה</button>
+        </td>
+        <td>
+          <button class="btn-action edit" (click)="editIdea(idea)">ערוך</button>
+          <button class="btn-action delete" (click)="deleteIdea(idea.id)">מחק</button>
+        </td>
+      </tr>
+      <tr *ngIf="ideas.length === 0">
+        <td colspan="8" class="text-center">אין כרגע רעיונות ברשימה. הוסיפי רעיון חדש בטופס למעלה.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
